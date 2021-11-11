@@ -1,0 +1,76 @@
+# SPDX-License-Identifier: MIT
+# Jobs to create a release
+name: Release
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+env:
+  GO_VERSION: "^1.17"
+
+jobs:
+  publish:
+    name: create-draft-release
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set up Go 1.x
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{ env.GO_VERSION }}
+      id: go
+
+    - uses: actions/checkout@v2.4.0
+
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v1
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Push container image
+      run: |
+        make push
+
+    - name: Run make all
+      run: |
+        make all
+
+    - name: generate changelog from git
+      run: |
+        echo "Image is available at \`docker.pkg.github.com/daimler/cluster-api-state-metrics/cluster-api-state-metrics:$(git describe --tags --exact-match)\`." > ${{ github.workflow }}-CHANGELOG.txt
+        git log --format=format:"* %h %s" $(git describe --tags --abbrev=0 @^)..@ >> ${{ github.workflow }}-CHANGELOG.txt
+
+    - name: Run foss-scan to generate notices file
+      run: |
+        GITHUB_REF="$(echo $GITHUB_REF_NAME | tr '/' '_')"
+        BLACKDUCK_SCAN_VERSION_NAME="${GITHUB_REF}_${GITHUB_SHA}"
+        export BLACKDUCK_SCAN_VERSION_NAME
+
+        ./hack/foss-scan.sh bdscan.txt bdscan.notices.txt
+        cp bin/scan-result/Black_Duck_Notices_Report.txt bin/scan-result/3RD_PARTY_LICENSES.txt
+      env:
+        BLACKDUCK_URL: ${{ secrets.BLACKDUCK_URL }}
+        BLACKDUCK_PROJECT_NAME: ${{ secrets.BLACKDUCK_PROJECT_NAME }}
+        BLACKDUCK_TOKEN: ${{ secrets.BLACKDUCK_TOKEN }}
+
+    - name: Archive foss scan notices report
+      uses: actions/upload-artifact@v2
+      with:
+        name: 3RD_PARTY_LICENSES.txt
+        path: bin/scan-result/Black_Duck_Notices_Report.txt
+
+    - name: Archive foss scan risk report
+      uses: actions/upload-artifact@v2
+      with:
+        name: foss-scan-risk-report
+        path: bin/scan-result/BlackDuck_RiskReport.pdf
+
+    - name: Release
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "bin/cluster-api-state-metrics,LICENSE,bin/scan-result/3RD_PARTY_LICENSES.txt"
+        bodyFile: "${{ github.workflow }}-CHANGELOG.txt"
+        token: ${{ secrets.GITHUB_TOKEN }}
+        draft: true

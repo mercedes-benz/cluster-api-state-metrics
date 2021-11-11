@@ -1,0 +1,53 @@
+# SPDX-License-Identifier: MIT
+# Jobs to run Blackduck based FOSS scan
+name: FOSS Scan
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+    branches:
+    - main
+
+env:
+  GO_VERSION: "^1.17"
+
+jobs:
+  foss-scan:
+    strategy:
+      max-parallel: 2
+    name: foss-scan
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set up Go 1.x
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{ env.GO_VERSION }}
+      id: go
+
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Synopsys Detect
+      run: |
+        GITHUB_REF="$(echo $GITHUB_REF_NAME | tr '/' '_')"
+        BLACKDUCK_SCAN_VERSION_NAME="${GITHUB_REF}_${GITHUB_SHA}"
+        export BLACKDUCK_SCAN_VERSION_NAME
+
+        ./hack/foss-scan.sh bdscan.txt bdscan.notices.txt
+      env:
+        BLACKDUCK_URL: ${{ secrets.BLACKDUCK_URL }}
+        BLACKDUCK_PROJECT_NAME: ${{ secrets.BLACKDUCK_PROJECT_NAME }}
+        BLACKDUCK_TOKEN: ${{ secrets.BLACKDUCK_TOKEN }}
+
+    - name: Archive foss scan notices report
+      uses: actions/upload-artifact@v2
+      with:
+        name: 3RD_PARTY_LICENSES.txt
+        path: bin/scan-result/Black_Duck_Notices_Report.txt
+
+    - name: Archive foss scan risk report
+      uses: actions/upload-artifact@v2
+      with:
+        name: foss-scan-risk-report
+        path: bin/scan-result/BlackDuck_RiskReport.pdf
