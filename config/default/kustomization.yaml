@@ -28,5 +28,5 @@ patchesStrategicMerge:
 
 images:
 - name: controller
-  newName: docker.pkg.github.com/daimler/cluster-api-state-metrics/cluster-api-state-metrics
+  newName: quay.io/cluster-api-state-metrics/cluster-api-state-metrics
   newTag: latest
