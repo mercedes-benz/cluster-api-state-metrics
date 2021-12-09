@@ -20,7 +20,19 @@ import (
 
 var descMachineDeploymentLabelsDefaultLabels = []string{"namespace", "machinedeployment", "uid"}
 
-func machineDeploymentMetricFamilies(allowLabelsList []string) []generator.FamilyGenerator {
+type MachineDeploymentFactory struct {
+	*ControllerRuntimeClientFactory
+}
+
+func (f *MachineDeploymentFactory) Name() string {
+	return "machinedeployments"
+}
+
+func (f *MachineDeploymentFactory) ExpectedType() interface{} {
+	return &clusterv1.MachineDeployment{}
+}
+
+func (f *MachineDeploymentFactory) MetricFamilyGenerators(allowAnnotationsList, allowLabelsList []string) []generator.FamilyGenerator {
 	return []generator.FamilyGenerator{
 		*generator.NewFamilyGenerator(
 			"capi_machinedeployment_labels",
@@ -240,7 +252,8 @@ func machineDeploymentMetricFamilies(allowLabelsList []string) []generator.Famil
 	}
 }
 
-func createMachineDeploymentListWatch(ctrlClient client.WithWatch, ns string, fieldSelector string) cache.ListerWatcher {
+func (f *MachineDeploymentFactory) ListWatch(customResourceClient interface{}, ns string, fieldSelector string) cache.ListerWatcher {
+	ctrlClient := customResourceClient.(client.WithWatch)
 	return &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
 			machineDeploymentList := clusterv1.MachineDeploymentList{}

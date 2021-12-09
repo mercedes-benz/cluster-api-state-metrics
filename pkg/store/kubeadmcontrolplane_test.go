@@ -126,8 +126,9 @@ func TestKubeadmControlPlaneStore(t *testing.T) {
 		},
 	}
 	for i, c := range cases {
-		c.Func = generator.ComposeMetricGenFuncs(kubeadmControlPlaneMetricFamilies(nil))
-		c.Headers = generator.ExtractMetricFamilyHeaders(kubeadmControlPlaneMetricFamilies(nil))
+		f := KubeadmControlPlaneFactory{}
+		c.Func = generator.ComposeMetricGenFuncs(f.MetricFamilyGenerators(nil, nil))
+		c.Headers = generator.ExtractMetricFamilyHeaders(f.MetricFamilyGenerators(nil, nil))
 		if err := c.run(); err != nil {
 			t.Errorf("unexpected collecting result in %vth run:\n%s", i, err)
 		}

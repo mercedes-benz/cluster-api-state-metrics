@@ -19,7 +19,19 @@ import (
 
 var descMachineLabelsDefaultLabels = []string{"namespace", "machine", "uid"}
 
-func machineMetricFamilies(allowLabelsList []string) []generator.FamilyGenerator {
+type MachineFactory struct {
+	*ControllerRuntimeClientFactory
+}
+
+func (f *MachineFactory) Name() string {
+	return "machines"
+}
+
+func (f *MachineFactory) ExpectedType() interface{} {
+	return &clusterv1.Machine{}
+}
+
+func (f *MachineFactory) MetricFamilyGenerators(allowAnnotationsList, allowLabelsList []string) []generator.FamilyGenerator {
 	return []generator.FamilyGenerator{
 		*generator.NewFamilyGenerator(
 			"capi_machine_labels",
@@ -194,7 +206,8 @@ func machineMetricFamilies(allowLabelsList []string) []generator.FamilyGenerator
 	}
 }
 
-func createMachineListWatch(ctrlClient client.WithWatch, ns string, fieldSelector string) cache.ListerWatcher {
+func (f *MachineFactory) ListWatch(customResourceClient interface{}, ns string, fieldSelector string) cache.ListerWatcher {
+	ctrlClient := customResourceClient.(client.WithWatch)
 	return &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
 			machineList := clusterv1.MachineList{}
