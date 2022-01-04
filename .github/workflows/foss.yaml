@@ -30,9 +30,9 @@ jobs:
 
     - name: Synopsys Detect
       run: |
-        GITHUB_REF="$(echo $GITHUB_REF_NAME | tr '/' '_')"
-        BLACKDUCK_SCAN_VERSION_NAME="${GITHUB_REF}_${GITHUB_SHA}"
+        BLACKDUCK_SCAN_VERSION_NAME="$(echo $GITHUB_REF_NAME | tr '/' '_')_${GITHUB_SHA}"
         export BLACKDUCK_SCAN_VERSION_NAME
+        echo "BLACKDUCK_SCAN_VERSION_NAME=${BLACKDUCK_SCAN_VERSION_NAME}"
 
         ./hack/foss-scan.sh bdscan.txt bdscan.notices.txt
       env:
