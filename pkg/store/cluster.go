@@ -19,7 +19,19 @@ import (
 
 var descClusterLabelsDefaultLabels = []string{"namespace", "cluster", "uid"}
 
-func clusterMetricFamilies(allowLabelsList []string) []generator.FamilyGenerator {
+type ClusterFactory struct {
+	*ControllerRuntimeClientFactory
+}
+
+func (f *ClusterFactory) Name() string {
+	return "clusters"
+}
+
+func (f *ClusterFactory) ExpectedType() interface{} {
+	return &clusterv1.Cluster{}
+}
+
+func (f *ClusterFactory) MetricFamilyGenerators(allowAnnotationsList, allowLabelsList []string) []generator.FamilyGenerator {
 	return []generator.FamilyGenerator{
 		*generator.NewFamilyGenerator(
 			"capi_cluster_labels",
@@ -114,7 +126,8 @@ func clusterMetricFamilies(allowLabelsList []string) []generator.FamilyGenerator
 	}
 }
 
-func createClusterListWatch(ctrlClient client.WithWatch, ns string, fieldSelector string) cache.ListerWatcher {
+func (f *ClusterFactory) ListWatch(customResourceClient interface{}, ns string, fieldSelector string) cache.ListerWatcher {
+	ctrlClient := customResourceClient.(client.WithWatch)
 	return &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
 			clusterList := clusterv1.ClusterList{}

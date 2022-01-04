@@ -20,7 +20,19 @@ import (
 
 var descKubeadmControlPlaneLabelsDefaultLabels = []string{"namespace", "kubeadmcontrolplane", "uid"}
 
-func kubeadmControlPlaneMetricFamilies(allowLabelsList []string) []generator.FamilyGenerator {
+type KubeadmControlPlaneFactory struct {
+	*ControllerRuntimeClientFactory
+}
+
+func (f *KubeadmControlPlaneFactory) Name() string {
+	return "kubeadmcontrolplanes"
+}
+
+func (f *KubeadmControlPlaneFactory) ExpectedType() interface{} {
+	return &controlplanev1.KubeadmControlPlane{}
+}
+
+func (f *KubeadmControlPlaneFactory) MetricFamilyGenerators(allowAnnotationsList, allowLabelsList []string) []generator.FamilyGenerator {
 	return []generator.FamilyGenerator{
 		*generator.NewFamilyGenerator(
 			"capi_kubeadmcontrolplane_labels",
@@ -201,7 +213,8 @@ func kubeadmControlPlaneMetricFamilies(allowLabelsList []string) []generator.Fam
 	}
 }
 
-func createKubeadmControlPlaneListWatch(ctrlClient client.WithWatch, ns string, fieldSelector string) cache.ListerWatcher {
+func (f *KubeadmControlPlaneFactory) ListWatch(customResourceClient interface{}, ns string, fieldSelector string) cache.ListerWatcher {
+	ctrlClient := customResourceClient.(client.WithWatch)
 	return &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
 			kubeadmControlPlaneList := controlplanev1.KubeadmControlPlaneList{}

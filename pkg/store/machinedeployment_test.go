@@ -142,8 +142,9 @@ func TestMachineDeploymentStore(t *testing.T) {
 		},
 	}
 	for i, c := range cases {
-		c.Func = generator.ComposeMetricGenFuncs(machineDeploymentMetricFamilies(nil))
-		c.Headers = generator.ExtractMetricFamilyHeaders(machineDeploymentMetricFamilies(nil))
+		f := MachineDeploymentFactory{}
+		c.Func = generator.ComposeMetricGenFuncs(f.MetricFamilyGenerators(nil, nil))
+		c.Headers = generator.ExtractMetricFamilyHeaders(f.MetricFamilyGenerators(nil, nil))
 		if err := c.run(); err != nil {
 			t.Errorf("unexpected collecting result in %vth run:\n%s", i, err)
 		}
