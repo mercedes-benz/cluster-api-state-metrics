@@ -97,7 +97,7 @@ bash <(curl -s -L https://detect.synopsys.com/detect.sh) \
 	--insecure
 RC=$?
 
-Delete the scan if it completed successfully.
+# Delete the scan if it completed successfully.
 if [[ ${RC} == 0 ]]; then
 	try_delete_version "${BLACKDUCK_SCAN_VERSION_NAME}" "${bearer_token}" "${project_url}"
 fi
