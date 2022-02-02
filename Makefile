@@ -67,6 +67,9 @@ vet: ## Run go vet against code.
 lint: # Run golangci-lint against code.
 	@hack/check_golangci-lint.sh
 
+helm-lint: # Run helm lint against helm chart code
+	helm lint deploy/chart
+
 spdxcheck: ## Run spdx check against all files.
 	@hack/check_spdx.sh
 
@@ -122,8 +125,14 @@ deploy: manifests kustomize ## Deploy controller to the K8s cluster specified in
 	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
 	$(KUSTOMIZE) build config/default | kubectl apply -f -
 
+helm-deploy: ## Deploy cluster-api-state-metrics chart to the K8s cluster specified in ~/.kube/config.
+	helm upgrade --install cluster-api-state-metrics deploy/chart
+
 undeploy: ## Undeploy controller from the K8s cluster specified in ~/.kube/config.
 	$(KUSTOMIZE) build config/default | kubectl delete -f -
+
+helm-undeploy: ## Uninstall the cluster-api-state-metrics chart from the K8s cluster specified in ~/.kube/config.
+	helm uninstall cluster-api-state-metrics
 
 # find or download controller-gen
 # download controller-gen if necessary
