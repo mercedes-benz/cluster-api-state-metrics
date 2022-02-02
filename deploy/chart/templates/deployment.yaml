@@ -1,0 +1,155 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "cluster-api-state-metrics.fullname" . }}
+  labels:
+    {{- include "cluster-api-state-metrics.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "cluster-api-state-metrics.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "cluster-api-state-metrics.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "cluster-api-state-metrics.serviceAccountName" . }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.config }}
+          args:
+            {{- if .Values.config.addDirHeader }}
+            - --add_dir_header
+            {{- end }}
+            {{- if .Values.config.alsoLogtoStderr }}
+            - --alsologtostderr
+            {{- end }}
+            {{- if .Values.config.enableGzipEncoding }}
+            - --enable-gzip-encoding
+            {{- end }}
+            {{- if .Values.config.logBacktraceAt }}
+            - --log_backtrace_at
+            - {{ .Values.config.logBacktraceAt | quote }}
+            {{- end }}
+            {{- if .Values.config.logDir }}
+            - --log_dir
+            - {{ .Values.config.logDir }}
+            {{- end }}
+            {{- if .Values.config.logFile }}
+            - --log_file
+            - {{ .Values.config.logFile }}
+            {{- end }}
+            {{- if .Values.config.logFileMaxSize }}
+            - --log_file_max_size
+            - {{ .Values.config.logFileMaxSize | quote }}
+            {{- end }}
+            {{- if .Values.config.logLevel }}
+            - --v
+            - {{ .Values.config.logLevel | quote }}
+            {{- end }}
+            - --logtostderr
+            - {{ .Values.config.logToStderr | quote }}
+            {{- if .Values.config.metricAllowlist }}
+            - --metric-allowlist
+            - {{ .Values.config.metricAllowlist | quote }}
+            {{- end }}
+            {{- if .Values.config.metricAnnotationsAllowlist }}
+            - --metric-annotations-allowlist
+            - {{ .Values.config.metricAnnotationsAllowlist | quote }}
+            {{- end }}
+            {{- if .Values.config.metricDenylist }}
+            - --metric-denylist
+            - {{ .Values.config.metricDenylist | quote }}
+            {{- end }}
+            {{- if .Values.config.metricLabelsAllowlist }}
+            - --metric-labels-allowlist
+            - {{ .Values.config.metricLabelsAllowlist | quote }}
+            {{- end }}
+            {{- if .Values.config.namespaces }}
+            - --namespaces
+            - {{ .Values.config.namespaces | quote }}
+            {{- end }}
+            {{- if .Values.config.namespacesDenylist }}
+            - --namespaces-denylist
+            - {{ .Values.config.namespacesDenylist | quote }}
+            {{- end }}
+            {{- if .Values.config.oneOutput }}
+            - --one_output
+            {{- end }}
+            {{- if .Values.config.port }}
+            - --port
+            - {{ .Values.config.port | quote }}
+            {{- end }}
+            {{- if .Values.config.resources }}
+            - --resources
+            - {{ .Values.config.resources | quote }}
+            {{- end }}
+            {{- if .Values.config.skipHeaders }}
+            - --skip_headers
+            {{- end }}
+            {{- if .Values.config.skipLogHeaders }}
+            - --skip_headers
+            {{- end }}
+            {{- if .Values.config.stderrThreshold }}
+            - --stderrthreshold
+            - {{ .Values.config.stderrThreshold | quote }}
+            {{- end }}
+            {{- if .Values.config.telemetryPort }}
+            - --telemetry-port
+            - {{ .Values.config.telemetryPort | quote }}
+            {{- end }}
+            {{- if .Values.config.useApiserverCache }}
+            - --use-apiserver-cache
+            {{- end }}
+          {{- end }}
+          ports:
+            - name: metrics
+              containerPort: {{ .Values.config.port }}
+              protocol: TCP
+            - name: telemetry
+              containerPort: {{ .Values.config.telemetryPort }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: telemetry
+              initialDelaySeconds: 15
+              periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: metrics
+              initialDelaySeconds: 5
+              periodSeconds: 10
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

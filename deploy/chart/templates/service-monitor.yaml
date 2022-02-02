@@ -1,0 +1,36 @@
+{{- if .Values.prometheusServiceMonitor.create -}}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "cluster-api-state-metrics.fullname" . }}
+  labels:
+    {{- include "cluster-api-state-metrics.labels" . | nindent 4 }}
+    {{- with .Values.prometheusServiceMonitor.serviceMonitorSelectorLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "cluster-api-state-metrics.selectorLabels" . | nindent 6 }}
+  endpoints:
+  - port: metrics
+    {{- with .Values.prometheusServiceMonitor.capiMetrics.metricRelabelings }}
+    metricRelabelings:
+    {{- toYaml . | nindent 4}}
+    {{- end }}
+    {{- with .Values.prometheusServiceMonitor.capiMetrics.relabelings }}
+    relabelings:
+    {{- toYaml . | nindent 4}}
+    {{- end }}
+  - port: self-metrics
+    {{- with .Values.prometheusServiceMonitor.exporterMetrics.metricRelabelings }}
+    metricRelabelings:
+    {{- toYaml . | nindent 4}}
+    {{- end }}
+    {{- with .Values.prometheusServiceMonitor.exporterMetrics.relabelings }}
+    relabelings:
+    {{- toYaml . | nindent 4}}
+    {{- end }}
+
+{{- end -}}

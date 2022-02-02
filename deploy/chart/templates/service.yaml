@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "cluster-api-state-metrics.fullname" . }}
+  labels:
+    {{- include "cluster-api-state-metrics.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: metrics
+      protocol: TCP
+      name: metrics
+    - port: {{ .Values.service.telemetryPort }}
+      targetPort: telemetry
+      protocol: TCP
+      name: telemetry
+  selector:
+    {{- include "cluster-api-state-metrics.selectorLabels" . | nindent 4 }}
