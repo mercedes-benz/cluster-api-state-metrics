@@ -131,14 +131,14 @@ spec:
             httpGet:
               path: /healthz
               port: telemetry
-              initialDelaySeconds: 15
-              periodSeconds: 20
+            initialDelaySeconds: 15
+            periodSeconds: 20
           readinessProbe:
             httpGet:
               path: /readyz
               port: metrics
-              initialDelaySeconds: 5
-              periodSeconds: 10
+            initialDelaySeconds: 5
+            periodSeconds: 10
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}

@@ -47,4 +47,3 @@ Most of the values documented below are simply passed to the `cluster-api-state-
 | `prometheusServiceMonitor.capiMetrics.metricRelabelings` | `{}` | Metric relabeling config used for the CAPI metrics |
 | `prometheusServiceMonitor.exporterMetrics.relabelings` | `{}` | Relabeling config used for the CAPI exporter self metrics |
 | `prometheusServiceMonitor.exporterMetrics.metricRelabelings` | `{}` | Metric relabeling config used for the CAPI exporter self metrics |
-| `grafanaDashboards.create` | `false` | If true, create grafanaDashboard. This requires the `grafanadashboards.integreatly.org` CRD provided by the [grafana-operator](https://github.com/grafana-operator/grafana-operator) to be installed  |
