@@ -75,6 +75,15 @@ func (f *KubeadmControlPlaneFactory) MetricFamilyGenerators(allowAnnotationsList
 		),
 
 		*generator.NewFamilyGenerator(
+			"capi_kubeadmcontrolplane_status_condition",
+			"The current status conditions of a machine.",
+			metric.Gauge,
+			"",
+			wrapKubeadmControlPlaneFunc(func(kcp *controlplanev1.KubeadmControlPlane) *metric.Family {
+				return getConditionMetricFamily(kcp.Status.Conditions)
+			}),
+		),
+		*generator.NewFamilyGenerator(
 			"capi_kubeadmcontrolplane_status_replicas",
 			"The number of replicas per kubeadmcontrolplane.",
 			metric.Gauge,
