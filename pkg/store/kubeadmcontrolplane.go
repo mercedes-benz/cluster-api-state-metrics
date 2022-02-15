@@ -13,6 +13,7 @@ import (
 	"k8s.io/kube-state-metrics/v2/pkg/metric"
 	generator "k8s.io/kube-state-metrics/v2/pkg/metric_generator"
 	controlplanev1 "sigs.k8s.io/cluster-api/controlplane/kubeadm/api/v1alpha4"
+	"sigs.k8s.io/cluster-api/util/annotations"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -73,7 +74,24 @@ func (f *KubeadmControlPlaneFactory) MetricFamilyGenerators(allowAnnotationsList
 				}
 			}),
 		),
-
+		*generator.NewFamilyGenerator(
+			"capi_kubeadmcontrolplane_paused",
+			"The kubeadmcontrolplane is paused and not reconciled.",
+			metric.Gauge,
+			"",
+			wrapKubeadmControlPlaneFunc(func(kcp *controlplanev1.KubeadmControlPlane) *metric.Family {
+				paused := annotations.HasPausedAnnotation(kcp)
+				return &metric.Family{
+					Metrics: []*metric.Metric{
+						{
+							LabelKeys:   []string{},
+							LabelValues: []string{},
+							Value:       boolFloat64(paused),
+						},
+					},
+				}
+			}),
+		),
 		*generator.NewFamilyGenerator(
 			"capi_kubeadmcontrolplane_status_replicas",
 			"The number of replicas per kubeadmcontrolplane.",
