@@ -12,6 +12,7 @@ import (
 	"k8s.io/kube-state-metrics/v2/pkg/metric"
 	generator "k8s.io/kube-state-metrics/v2/pkg/metric_generator"
 	clusterv1 "sigs.k8s.io/cluster-api/api/v1alpha4"
+	"sigs.k8s.io/cluster-api/util/annotations"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -69,6 +70,24 @@ func (f *ClusterFactory) MetricFamilyGenerators(allowAnnotationsList, allowLabel
 
 				return &metric.Family{
 					Metrics: ms,
+				}
+			}),
+		),
+		*generator.NewFamilyGenerator(
+			"capi_cluster_paused",
+			"The cluster is paused and not reconciled.",
+			metric.Gauge,
+			"",
+			wrapClusterFunc(func(c *clusterv1.Cluster) *metric.Family {
+				paused := annotations.HasPausedAnnotation(c) || c.Spec.Paused
+				return &metric.Family{
+					Metrics: []*metric.Metric{
+						{
+							LabelKeys:   []string{},
+							LabelValues: []string{},
+							Value:       boolFloat64(paused),
+						},
+					},
 				}
 			}),
 		),

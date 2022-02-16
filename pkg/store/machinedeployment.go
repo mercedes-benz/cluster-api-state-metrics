@@ -13,6 +13,7 @@ import (
 	"k8s.io/kube-state-metrics/v2/pkg/metric"
 	generator "k8s.io/kube-state-metrics/v2/pkg/metric_generator"
 	clusterv1 "sigs.k8s.io/cluster-api/api/v1alpha4"
+	"sigs.k8s.io/cluster-api/util/annotations"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -70,6 +71,24 @@ func (f *MachineDeploymentFactory) MetricFamilyGenerators(allowAnnotationsList, 
 
 				return &metric.Family{
 					Metrics: ms,
+				}
+			}),
+		),
+		*generator.NewFamilyGenerator(
+			"capi_machinedeployment_paused",
+			"The machinedeployment is paused and not reconciled.",
+			metric.Gauge,
+			"",
+			wrapMachineDeploymentFunc(func(md *clusterv1.MachineDeployment) *metric.Family {
+				paused := annotations.HasPausedAnnotation(md) || md.Spec.Paused
+				return &metric.Family{
+					Metrics: []*metric.Metric{
+						{
+							LabelKeys:   []string{},
+							LabelValues: []string{},
+							Value:       boolFloat64(paused),
+						},
+					},
 				}
 			}),
 		),
