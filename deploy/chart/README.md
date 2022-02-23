@@ -1,3 +1,4 @@
+<!-- SPDX-License-Identifier: MIT -->
 # cluster-api-state-metrics
 
 This helm chart allows you to deploy `cluster-api-state-metrics` to a Kubernetes cluster.

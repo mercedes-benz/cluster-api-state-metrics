@@ -1,10 +1,12 @@
+
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
-metadata:  
-  name: {{ include "cluster-api-state-metrics.fullname" . }}-role
+metadata:
   labels:
     {{- include "cluster-api-state-metrics.labels" . | nindent 4 }}
+  creationTimestamp: null
+  name: {{ include "cluster-api-state-metrics.fullname" . }}-manager-role
 rules:
 - apiGroups:
   - cluster.x-k8s.io

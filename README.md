@@ -112,7 +112,7 @@ General
   help             Display this help.
 
 Development
-  manifests        Generate WebhookConfiguration, ClusterRole objects.
+  manifests        Generate WebhookConfiguration, ClusterRole objects, and role templates for the helm chart.
   generate         Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
   fmt              Run go fmt against code.
   vet              Run go vet against code.
@@ -130,7 +130,9 @@ Build
 Deployment
   template         Create kustomized deployment yaml.
   deploy           Deploy controller to the K8s cluster specified in ~/.kube/config.
+  helm-deploy      Deploy cluster-api-state-metrics chart to the K8s cluster specified in ~/.kube/config.
   undeploy         Undeploy controller from the K8s cluster specified in ~/.kube/config.
+  helm-undeploy    Uninstall the cluster-api-state-metrics chart from the K8s cluster specified in ~/.kube/config.
 ```
 
 # Metrics Documentation
