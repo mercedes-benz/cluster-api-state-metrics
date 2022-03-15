@@ -52,8 +52,9 @@ help: ## Display this help.
 
 ##@ Development
 
-manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole objects.
-	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..."
+manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole objects, and role templates for the helm chart.
+	@$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..."
+	@hack/generate-role-tmpl.sh
 
 generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
 	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."
@@ -64,8 +65,11 @@ fmt: ## Run go fmt against code.
 vet: ## Run go vet against code.
 	go vet ./...
 
-lint: # Run golangci-lint against code.
+lint: helm-lint ## Run golangci-lint against code.
 	@hack/check_golangci-lint.sh
+
+helm-lint: # Run helm lint against helm chart code
+	helm lint deploy/chart
 
 spdxcheck: ## Run spdx check against all files.
 	@hack/check_spdx.sh
@@ -122,8 +126,14 @@ deploy: manifests kustomize ## Deploy controller to the K8s cluster specified in
 	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
 	$(KUSTOMIZE) build config/default | kubectl apply -f -
 
+helm-deploy: ## Deploy cluster-api-state-metrics chart to the K8s cluster specified in ~/.kube/config.
+	helm upgrade --install cluster-api-state-metrics deploy/chart
+
 undeploy: ## Undeploy controller from the K8s cluster specified in ~/.kube/config.
 	$(KUSTOMIZE) build config/default | kubectl delete -f -
+
+helm-undeploy: ## Uninstall the cluster-api-state-metrics chart from the K8s cluster specified in ~/.kube/config.
+	helm uninstall cluster-api-state-metrics
 
 # find or download controller-gen
 # download controller-gen if necessary

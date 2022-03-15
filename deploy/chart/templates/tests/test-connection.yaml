@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "cluster-api-state-metrics.fullname" . }}-test-connection"
+  labels:
+    {{- include "cluster-api-state-metrics.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command:
+        - "wget"
+      args:
+        - "{{ include "cluster-api-state-metrics.fullname" . }}:{{ .Values.service.port }}"
+  restartPolicy: Never
