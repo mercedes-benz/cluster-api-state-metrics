@@ -116,6 +116,7 @@ Development
   generate         Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
   fmt              Run go fmt against code.
   vet              Run go vet against code.
+  lint             Run golangci-lint against code.
   spdxcheck        Run spdx check against all files.
   doccheck         Run docs specific checks
   test             Run tests.
