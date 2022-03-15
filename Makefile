@@ -65,7 +65,7 @@ fmt: ## Run go fmt against code.
 vet: ## Run go vet against code.
 	go vet ./...
 
-lint: # Run golangci-lint against code.
+lint: helm-lint ## Run golangci-lint against code.
 	@hack/check_golangci-lint.sh
 
 helm-lint: # Run helm lint against helm chart code
