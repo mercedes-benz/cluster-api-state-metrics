@@ -9,7 +9,7 @@ require (
 	k8s.io/api v0.23.0
 	k8s.io/apimachinery v0.23.0
 	k8s.io/client-go v0.23.0
-	k8s.io/klog/v2 v2.30.0
+	k8s.io/klog/v2 v2.80.1
 	k8s.io/kube-state-metrics/v2 v2.3.1-0.20220104140053-41eea36f69ef
 	k8s.io/utils v0.0.0-20210930125809-cb0fa318a74b
 	sigs.k8s.io/cluster-api v1.0.0
