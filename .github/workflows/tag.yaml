@@ -20,7 +20,7 @@ jobs:
         go-version: ${{ env.GO_VERSION }}
       id: go
 
-    - uses: actions/checkout@v2.4.0
+    - uses: actions/checkout@v3.1.0
 
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v1

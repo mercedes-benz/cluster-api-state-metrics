@@ -27,7 +27,7 @@ jobs:
       id: go
 
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3.1.0
 
     - name: golangci-lint
       uses: golangci/golangci-lint-action@v3.1.0
@@ -45,7 +45,7 @@ jobs:
       id: go
 
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3.1.0
 
     - name: make build
       run: |
@@ -62,7 +62,7 @@ jobs:
       id: go
 
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3.1.0
 
     - name: make manifests generate
       run: |
@@ -80,7 +80,7 @@ jobs:
       id: go
 
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3.1.0
 
     - name: make docs doccheck
       run: |
@@ -97,7 +97,7 @@ jobs:
       id: go
 
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3.1.0
 
     - name: make spdxcheck
       run: |
@@ -114,7 +114,7 @@ jobs:
       id: go
 
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3.1.0
 
     - name: make fmt vet
       run: |
