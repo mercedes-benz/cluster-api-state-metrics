@@ -3,6 +3,14 @@
 [![CI](https://github.com/Daimler/cluster-api-state-metrics/actions/workflows/ci.yaml/badge.svg)](https://github.com/Daimler/cluster-api-state-metrics/actions/workflows/ci.yaml)
 [![FOSS Scan](https://github.com/Daimler/cluster-api-state-metrics/actions/workflows/foss.yaml/badge.svg)](https://github.com/Daimler/cluster-api-state-metrics/actions/workflows/foss.yaml)
 
+# This project is no longer maintained and is archived
+
+A new feature in kube-state-metrics that allows the [generation of metrics for custom resources](https://github.com/kubernetes/kube-state-metrics/pull/1710) and the [integration of that in core CAPI](https://github.com/kubernetes-sigs/cluster-api/pull/7095) has made the present cluster-api-state-metrics project obsolete. For more information see following:
+* https://github.com/kubernetes-sigs/cluster-api/issues/6458#issuecomment-1145910955
+* https://github.com/kubernetes-sigs/cluster-api/pull/6570
+
+We thank all contributors for their awesome work and @chrischdi for starting this as a whole.
+
 # Overview
 
 cluster-api-state-metrics (CASM) is a service that listens to the Kubernetes API server and generates metrics about the state of custom resource objects related of [Kubernetes Cluster API].
