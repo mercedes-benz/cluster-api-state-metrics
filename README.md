@@ -9,7 +9,7 @@ A new feature in kube-state-metrics that allows the [generation of metrics for c
 * https://github.com/kubernetes-sigs/cluster-api/issues/6458#issuecomment-1145910955
 * https://github.com/kubernetes-sigs/cluster-api/pull/6570
 
-We thank all contributors for their awesome work and @chrischdi for starting this as a whole.
+We thank all contributors for their awesome work and [@chrischdi](https://github.com/chrischdi) for starting this as a whole.
 
 # Overview
 
